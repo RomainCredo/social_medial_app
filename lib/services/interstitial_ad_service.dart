@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class InterstitialAdService {
@@ -11,16 +11,17 @@ class InterstitialAdService {
   static const String _iosInterstitialUnitId =
       'ca-app-pub-3940256099942544/4411468910';
 
-  bool get isReady => _interstitialAd != null;
+  bool get isReady => !kIsWeb && _interstitialAd != null;
 
   void loadAd() {
-    if (_interstitialAd != null || _isLoading) {
+    // AdMob is not supported on Web; early exit to prevent crashes
+    if (kIsWeb || _interstitialAd != null || _isLoading) {
       return;
     }
 
     _isLoading = true;
 
-    final String adUnitId = Platform.isAndroid
+    final String adUnitId = defaultTargetPlatform == TargetPlatform.android
         ? _androidInterstitialUnitId
         : _iosInterstitialUnitId;
 
@@ -38,14 +39,12 @@ class InterstitialAdService {
               _interstitialAd = null;
               loadAd();
             },
-            onAdFailedToShowFullScreenContent: (
-              InterstitialAd ad,
-              AdError error,
-            ) {
-              ad.dispose();
-              _interstitialAd = null;
-              loadAd();
-            },
+            onAdFailedToShowFullScreenContent:
+                (InterstitialAd ad, AdError error) {
+                  ad.dispose();
+                  _interstitialAd = null;
+                  loadAd();
+                },
           );
         },
         onAdFailedToLoad: (LoadAdError error) {
@@ -57,7 +56,7 @@ class InterstitialAdService {
   }
 
   void showAd() {
-    if (_interstitialAd == null) {
+    if (kIsWeb || _interstitialAd == null) {
       return;
     }
 
@@ -65,7 +64,9 @@ class InterstitialAdService {
   }
 
   void dispose() {
-    _interstitialAd?.dispose();
-    _interstitialAd = null;
+    if (!kIsWeb) {
+      _interstitialAd?.dispose();
+      _interstitialAd = null;
+    }
   }
 }

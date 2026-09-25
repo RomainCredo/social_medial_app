@@ -1,17 +1,20 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+
 import 'firebase_options.dart';
 import 'screens/auth_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  await MobileAds.instance.initialize();
+  // Initialize Mobile Ads ONLY on iOS/Android (prevents crash on Web)
+  if (!kIsWeb) {
+    await MobileAds.instance.initialize();
+  }
 
   runApp(const SocialMediaApp());
 }

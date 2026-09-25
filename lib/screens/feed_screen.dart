@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import '../models/post.dart';
 import '../services/post_service.dart';
 import '../services/storage_service.dart';
@@ -29,9 +31,7 @@ class _FeedScreenState extends State<FeedScreen> {
   Future<void> _openCreatePost() async {
     await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const CreatePostScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const CreatePostScreen()),
     );
   }
 
@@ -67,16 +67,16 @@ class _FeedScreenState extends State<FeedScreen> {
       await _postService.deletePost(post.id);
     } on PostException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message)),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.message)));
       }
     }
   }
 
   Future<void> _handleEdit(Post post) async {
-    final TextEditingController editController =
-        TextEditingController(text: post.text);
+    final TextEditingController editController = TextEditingController(
+      text: post.text,
+    );
 
     final String? newText = await showDialog<String>(
       context: context,
@@ -87,9 +87,7 @@ class _FeedScreenState extends State<FeedScreen> {
           maxLines: 4,
           maxLength: 500,
           autofocus: true,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-          ),
+          decoration: const InputDecoration(border: OutlineInputBorder()),
         ),
         actions: [
           TextButton(
@@ -113,28 +111,21 @@ class _FeedScreenState extends State<FeedScreen> {
     }
 
     try {
-      await _postService.updatePost(
-        postId: post.id,
-        newText: newText,
-      );
+      await _postService.updatePost(postId: post.id, newText: newText);
     } on PostException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message)),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.message)));
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final String? currentUid =
-        FirebaseAuth.instance.currentUser?.uid;
+    final String? currentUid = FirebaseAuth.instance.currentUser?.uid;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Social Feed'),
-      ),
+      appBar: AppBar(title: const Text('Social Feed')),
       body: StreamBuilder<List<Post>>(
         stream: _postsStream,
         builder: (context, snapshot) {
@@ -164,8 +155,7 @@ class _FeedScreenState extends State<FeedScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.forum_outlined,
-                        size: 72, color: Colors.grey),
+                    Icon(Icons.forum_outlined, size: 72, color: Colors.grey),
                     SizedBox(height: 16),
                     Text(
                       'No posts yet.',
@@ -202,7 +192,8 @@ class _FeedScreenState extends State<FeedScreen> {
           );
         },
       ),
-      bottomNavigationBar: const BannerAdWidget(),
+      // kIsWeb checks if running in Chrome/Web and disables AdMob banner safely
+      bottomNavigationBar: kIsWeb ? null : const BannerAdWidget(),
       floatingActionButton: FloatingActionButton(
         onPressed: _openCreatePost,
         tooltip: 'Create post',
