@@ -158,7 +158,7 @@ class _FeedScreenState extends State<FeedScreen> {
                     Icon(Icons.forum_outlined, size: 72, color: Colors.grey),
                     SizedBox(height: 16),
                     Text(
-                      'No posts yet.',
+                      'Welcome! No posts yet.',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
